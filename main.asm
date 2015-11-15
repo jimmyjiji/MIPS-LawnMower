@@ -44,6 +44,5 @@ main:
 filename: .asciiz "hw3/landscape1.map" 
 .align 2
 shortvalue: .asciiz "+/xx"	#searching for lawn mower 
-command: .asciiz "waasssddddccaaaxxxsss"
-
+command: .asciiz "dddddddddddddddddddddwwwwwwwwwwwwwsssssssssssssssssssssssssssssssssssssssssssss"
 .include "hw3.asm"

@@ -221,7 +221,27 @@ playGame:
 		beq $t0, 100, d
 		j nextcommand
 		
-		w:
+		w:				
+			#################
+			lb $t1, -159($s0)
+			lb $t2, -160($s0)
+			sll $t3, $t1, 8
+			or $t3, $t3, $t2
+			move $t1, $t3		#set t1 as previous 2 bytes without having to deal with lh shenanigans 
+			##################
+			li $t2, 0xffffb06f		#flowers 
+			li $t3, 0x00007f52		#rocks
+			li $t4, 0x00002f5e		#tree
+			li $t5, 0x00003f20		#dirt
+			li $t6, 0x00004f20		#water 
+			
+			beq $t1, $t2, nextcommand
+			beq $t1, $t3, nextcommand
+			beq $t1, $t4, nextcommand
+			beq $t1, $t5, nextcommand
+			beq $t1, $t6, nextcommand
+			#########################################	checks collision 
+			
 			sb $s5, ($s0)		#delete the lawnmower 
 			addi $s0, $s0, 1	#go up to delete the grass address
 			lb $t1, ($s0) 		#create temp register for value at current address
@@ -232,6 +252,26 @@ playGame:
 			j nextcommand
 				
 		a:
+			#################
+			lb $t1, -1($s0)
+			lb $t2, -2($s0)
+			sll $t3, $t1, 8
+			or $t3, $t3, $t2
+			move $t1, $t3		#set t1 as previous 2 bytes without having to deal with lh shenanigans 
+			##################
+			li $t2, 0xffffb06f		#flowers 
+			li $t3, 0x00007f52		#rocks
+			li $t4, 0x00002f5e		#tree
+			li $t5, 0x00003f20		#dirt
+			li $t6, 0x00004f20		#water 
+			
+			beq $t1, $t2, nextcommand
+			beq $t1, $t3, nextcommand
+			beq $t1, $t4, nextcommand
+			beq $t1, $t5, nextcommand
+			beq $t1, $t6, nextcommand
+			#########################################	checks collision 
+			
 			sb $s5, ($s0)		#delete the lawnmower 
 			addi $s0, $s0, 1	#go up to delete the grass address
 			lb $t1, ($s0) 		#create temp register for value at current address
@@ -240,7 +280,28 @@ playGame:
 			addi $s0, $s0, -3	#go back address
 			sb $s4, ($s0)		#create lawnmower 
 			j nextcommand
-		s:
+		s:	
+		
+			#################
+			lb $t1, 161($s0)
+			lb $t2, 160($s0)
+			sll $t3, $t1, 8
+			or $t3, $t3, $t2
+			move $t1, $t3		#set t1 as previous 2 bytes without having to deal with lh shenanigans 
+			##################
+			li $t2, 0xffffb06f		#flowers 
+			li $t3, 0x00007f52		#rocks
+			li $t4, 0x00002f5e		#tree
+			li $t5, 0x00003f20		#dirt
+			li $t6, 0x00004f20		#water 
+			
+			beq $t1, $t2, nextcommand
+			beq $t1, $t3, nextcommand
+			beq $t1, $t4, nextcommand
+			beq $t1, $t5, nextcommand
+			beq $t1, $t6, nextcommand
+			#########################################	checks collision 
+			
 			sb $s5, ($s0)		#delete the lawnmower 
 			addi $s0, $s0, 1	#go up to delete the grass address
 			lb $t1, ($s0) 		#create temp register for value at current address
@@ -250,6 +311,26 @@ playGame:
 			sb $s4, ($s0)		#create lawnmower 
 			j nextcommand
 		d:
+			#################
+			lb $t1, 3($s0)
+			lb $t2, 2($s0)
+			sll $t3, $t1, 8
+			or $t3, $t3, $t2
+			move $t1, $t3		#set t1 as previous 2 bytes without having to deal with lh shenanigans 
+			##################
+			li $t2, 0xffffb06f		#flowers 
+			li $t3, 0x00007f52		#rocks
+			li $t4, 0x00002f5e		#tree
+			li $t5, 0x00003f20		#dirt
+			li $t6, 0x00004f20		#water 
+			
+			beq $t1, $t2, nextcommand
+			beq $t1, $t3, nextcommand
+			beq $t1, $t4, nextcommand
+			beq $t1, $t5, nextcommand
+			beq $t1, $t6, nextcommand
+			#########################################	checks collision 
+			
 			sb $s5, ($s0)		#delete the lawnmower 
 			addi $s0, $s0, 1	#go up address
 			lb $t1, ($s0) 		#create temp register for value at current address
@@ -259,9 +340,11 @@ playGame:
 			sb $s4, ($s0)		#create lawnmower 
 			j nextcommand
 		
+			
+			
 		nextcommand:
 			li $v0, 32
-			li $a0, 500
+			li $a0, 100
 			syscall			#sleep
 			
 			addi $s3, $s3, 1	#increment command line 
