@@ -64,7 +64,7 @@ close_and_end:
 	#li $v0, 4
 	#la $a0, buffer
 	#syscall 
-	###################
+	####################
 	
 	lw $s0, 0($sp)
 	lw $s1, 4($sp)
@@ -106,17 +106,17 @@ find2Byte:
 	move $t1, $t0
 	move $t0, $t2
 	
-	######################################## test
+	######################################### test
 	
-	li $v0, 4
-	la $a0, nextline
-	syscall
+	#li $v0, 4
+	#la $a0, nextline
+	#syscall
 	
-	li $v0, 11
-	move $a0, $t0
-	syscall
-	move $a0, $t1
-	syscall
+	#li $v0, 11
+	#move $a0, $t0
+	#syscall
+	#move $a0, $t1
+	#syscall
 	
 	########################################## test
 	li $t2, 0 		# row counter 
@@ -147,8 +147,8 @@ find2Byte:
 			beq $t1, $t4, eqsecondbit
 			j add1
 		eqsecondbit:
-			move $s5, $t3		#set s5 to column#
-			move $v0, $s4	
+			move $s5, $t3		#set s5 to column number
+			move $v0, $s4		#set v0 to row number
 			addi $v1, $s5, -1
 			div $v1, $t7		#divide columns by 2
 			mflo $v1		#set v1 to quotient in mflo. 
@@ -185,8 +185,76 @@ find2Byte:
 playGame:
 	#Define your code here
 	
-
-
+	#la $a0, 4294901760 #base address  
+	#move $a1, $v0	
+	#move $a2, $v1
+	#la $a3, command 
+	la $s0, ($a0)		#base address
+	move $s1, $a1		#row
+	move $s2, $a2		#column	
+	la $s3, ($a3)		#command line
+	li $s4, 43		#lawnmower 
+	li $s5, 32		#space 
+	
+	
+	bltz $s1, beginGame	#if row is -1, start mower at default location 
+	
+	changeMowerLocation:
+		li $t0, 80
+		li $t1, 0		#address incrementer 
+		li $t2, 2		#multiply by 2
+		mul $s1, $s1, $t0	#multiply the rows by 80
+		add  $t1, $s1, $s2
+		mul $t1, $t1, $t2
+		add $s0, $s0, $t1
+		
+	
+	lb $t0, ($s3)		#load the first byte of the command line 
+	
+	
+	beginGame:
+		beqz $t0, endGame	#if the command line ends, go to end game 
+		
+		beq $t0, 119, w
+		beq $t0, 97, a
+		beq $t0, 115, s
+		beq $t0, 100, d
+		j nextcommand
+		
+		w:
+				
+		a:
+			sb $s5, ($s0)		#delete the lawnmower 
+			addi $s0, $s0, 1	#go up to delete the grass address
+			lb $t1, ($s0) 		#create temp register for value at current address
+			ori $t1, $t1, 128	#make the bold bit 1
+			sb $t1, ($s0)		#store the change into current address
+			addi $s0, $s0, -3	#go back address
+			sb $s4, ($s0)		#create lawnmower 
+			j nextcommand
+		s:
+			
+		d:
+			sb $s5, ($s0)		#delete the lawnmower 
+			addi $s0, $s0, 1	#go up address
+			lb $t1, ($s0) 		#create temp register for value at current address
+			ori $t1, $t1, 128	#make the bold bit 1
+			sb $t1, ($s0)		#store the change into current address
+			addi $s0, $s0, 1	#go up address
+			sb $s4, ($s0)		#create lawnmower 
+			j nextcommand
+		
+		nextcommand:
+			li $v0, 32
+			li $a0, 500
+			syscall			#sleep
+			
+			addi $s3, $s3, 1	#increment command line 
+			lb $t0, ($s3)		#reload the t0 checker 
+			j beginGame
+	endGame:	
+	
+	jr $ra
 .data
 	#Define your memory here 
 
