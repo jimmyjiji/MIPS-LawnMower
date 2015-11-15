@@ -222,6 +222,14 @@ playGame:
 		j nextcommand
 		
 		w:
+			sb $s5, ($s0)		#delete the lawnmower 
+			addi $s0, $s0, 1	#go up to delete the grass address
+			lb $t1, ($s0) 		#create temp register for value at current address
+			ori $t1, $t1, 128	#make the bold bit 1
+			sb $t1, ($s0)		#store the change into current address
+			addi $s0, $s0, -161	#go up row 
+			sb $s4, ($s0)		#create lawnmower 
+			j nextcommand
 				
 		a:
 			sb $s5, ($s0)		#delete the lawnmower 
@@ -233,7 +241,14 @@ playGame:
 			sb $s4, ($s0)		#create lawnmower 
 			j nextcommand
 		s:
-			
+			sb $s5, ($s0)		#delete the lawnmower 
+			addi $s0, $s0, 1	#go up to delete the grass address
+			lb $t1, ($s0) 		#create temp register for value at current address
+			ori $t1, $t1, 128	#make the bold bit 1
+			sb $t1, ($s0)		#store the change into current address
+			addi $s0, $s0, 159	#go down row 
+			sb $s4, ($s0)		#create lawnmower 
+			j nextcommand
 		d:
 			sb $s5, ($s0)		#delete the lawnmower 
 			addi $s0, $s0, 1	#go up address
