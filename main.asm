@@ -41,8 +41,8 @@ main:
 
 
 .data 
-filename: .asciiz "hw3/landscape1.map" 
+filename: .asciiz "//files/UndergradHome/jjji/Desktop/hw3/MIPS-LawnMower-master/landscape2.map" 
 .align 2
 shortvalue: .asciiz "+/xx"	#searching for lawn mower 
-command: .asciiz "dddddddddddddddddddddwwwwwwwwwwwwwsssssssssssssssssssssssssssssssssssssssssssss"
+command: .asciiz "sssssssssssssaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 .include "hw3.asm"

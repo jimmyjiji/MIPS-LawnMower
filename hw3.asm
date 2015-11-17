@@ -185,19 +185,24 @@ find2Byte:
 playGame:
 	#Define your code here
 	
-	#la $a0, 4294901760 #base address  
-	#move $a1, $v0	
-	#move $a2, $v1
-	#la $a3, command 
+	sw $s0, 0($sp)
+	sw $s1, 4($sp)
+	sw $s2, 8($sp)
+	sw $s3, 12($sp)		
+	sw $s4, 16($sp)
+	sw $s5, 20($sp)		#push used s variables onto the stack 
+	sw $s6, 24($sp)
+	
+	
 	la $s0, ($a0)		#base address
 	move $s1, $a1		#row
 	move $s2, $a2		#column	
 	la $s3, ($a3)		#command line
 	li $s4, 43		#lawnmower 
 	li $s5, 32		#space 
+	li $s6, 0		#position locator 
 	
-	
-	bltz $s1, beginGame	#if row is -1, start mower at default location 
+	bltz $s1, start	#if row is -1, start mower at default location 
 	
 	changeMowerLocation:
 		li $t0, 80
@@ -207,8 +212,11 @@ playGame:
 		add  $t1, $s1, $s2
 		mul $t1, $t1, $t2
 		add $s0, $s0, $t1
-		
+		move $s6, $t1		#set position locator to current location 
+		j start
 	
+		
+	start:
 	lb $t0, ($s3)		#load the first byte of the command line 
 	
 	
@@ -221,7 +229,8 @@ playGame:
 		beq $t0, 100, d
 		j nextcommand
 		
-		w:				
+		w:	
+			blt $s6, 160, wrapW						
 			#################
 			lb $t1, -159($s0)
 			lb $t2, -160($s0)
@@ -242,6 +251,23 @@ playGame:
 			beq $t1, $t6, nextcommand
 			#########################################	checks collision 
 			
+			j normalW
+			
+			wrapW:
+				li $t1, 24
+				li $t2, 160
+				mul $t3, $t1, $t2	#set adding address to t3
+				sb $s5, ($s0)		#delete the lawnmower 
+				addi $s0, $s0, 1	#go up to delete the grass address	
+				lb $t1, ($s0) 		#create temp register for value at current address
+				ori $t1, $t1, 128	#make the bold bit 1
+				sb $t1, ($s0)		#store the change into current address
+				add $s0, $s0, $t3	#go up row 
+				addi $s0, $s0, -1
+				sb $s4, ($s0)		#create lawnmower 
+				add $s6, $s6, $t3	#move position locator 
+				
+			normalW:
 			sb $s5, ($s0)		#delete the lawnmower 
 			addi $s0, $s0, 1	#go up to delete the grass address
 			lb $t1, ($s0) 		#create temp register for value at current address
@@ -249,9 +275,11 @@ playGame:
 			sb $t1, ($s0)		#store the change into current address
 			addi $s0, $s0, -161	#go up row 
 			sb $s4, ($s0)		#create lawnmower 
+			addi $s6, $s6, -160	#move position locator 
 			j nextcommand
 				
 		a:
+			
 			#################
 			lb $t1, -1($s0)
 			lb $t2, -2($s0)
@@ -272,6 +300,24 @@ playGame:
 			beq $t1, $t6, nextcommand
 			#########################################	checks collision 
 			
+			li $t1, 160
+			div $s6, $t1
+			mfhi $t1 
+			beqz $t1, wrapA
+			j normalA
+			
+			wrapA:
+				sb $s5, ($s0)		#delete the lawnmower 
+				addi $s0, $s0, 1	#go up to delete the grass address
+				lb $t1, ($s0) 		#create temp register for value at current address
+				ori $t1, $t1, 128	#make the bold bit 1
+				sb $t1, ($s0)		#store the change into current address
+				addi $s0, $s0, 157	#go up address
+				sb $s4, ($s0)		#create lawnmower 
+				addi $s6, $s6, 158	#move position locator 
+				j nextcommand
+			
+			normalA:
 			sb $s5, ($s0)		#delete the lawnmower 
 			addi $s0, $s0, 1	#go up to delete the grass address
 			lb $t1, ($s0) 		#create temp register for value at current address
@@ -279,9 +325,12 @@ playGame:
 			sb $t1, ($s0)		#store the change into current address
 			addi $s0, $s0, -3	#go back address
 			sb $s4, ($s0)		#create lawnmower 
+			addi $s6, $s6, -2	#move position locator 
 			j nextcommand
+			
+			
 		s:	
-		
+			bge $s6, 3840, wrapS
 			#################
 			lb $t1, 161($s0)
 			lb $t2, 160($s0)
@@ -301,7 +350,23 @@ playGame:
 			beq $t1, $t5, nextcommand
 			beq $t1, $t6, nextcommand
 			#########################################	checks collision 
+			j normalS
 			
+			wrapS:
+				li $t1, 24
+				li $t2, 160
+				mul $t3, $t1, $t2	#set adding address to t3
+				sb $s5, ($s0)		#delete the lawnmower 
+				addi $s0, $s0, 1	#go up to delete the grass address	
+				lb $t1, ($s0) 		#create temp register for value at current address
+				ori $t1, $t1, 128	#make the bold bit 1
+				sb $t1, ($s0)		#store the change into current address
+				sub $s0, $s0, $t3	#go back row 
+				addi $s0, $s0, -1
+				sb $s4, ($s0)		#create lawnmower 
+				sub $s6, $s6, $t3	#move position locator 
+				
+			normalS:
 			sb $s5, ($s0)		#delete the lawnmower 
 			addi $s0, $s0, 1	#go up to delete the grass address
 			lb $t1, ($s0) 		#create temp register for value at current address
@@ -309,6 +374,7 @@ playGame:
 			sb $t1, ($s0)		#store the change into current address
 			addi $s0, $s0, 159	#go down row 
 			sb $s4, ($s0)		#create lawnmower 
+			addi $s6, $s6, 160	#move position locator 
 			j nextcommand
 		d:
 			#################
@@ -331,6 +397,25 @@ playGame:
 			beq $t1, $t6, nextcommand
 			#########################################	checks collision 
 			
+			li $t1, 160
+			div $s6, $t1
+			mfhi $t1 
+			beqz $t1, wrapD
+			j normalD
+			
+			wrapD:
+				sb $s5, ($s0)		#delete the lawnmower 
+				addi $s0, $s0, -161	#go back address
+				sb $s4, ($s0)		#create lawnmower 
+				addi $s6, $s6, -161	#move position locator 
+				addi $s0, $s0, 1	#go up to delete the grass address
+				lb $t1, ($s0) 		#create temp register for value at current address
+				ori $t1, $t1, 128	#make the bold bit 1
+				sb $t1, ($s0)		#store the change into current address
+				j nextcommand
+			########################################
+			
+			normalD:
 			sb $s5, ($s0)		#delete the lawnmower 
 			addi $s0, $s0, 1	#go up address
 			lb $t1, ($s0) 		#create temp register for value at current address
@@ -338,6 +423,7 @@ playGame:
 			sb $t1, ($s0)		#store the change into current address
 			addi $s0, $s0, 1	#go up address
 			sb $s4, ($s0)		#create lawnmower 
+			addi $s6, $s6, 2	#move position locator 
 			j nextcommand
 		
 			
@@ -351,6 +437,13 @@ playGame:
 			lb $t0, ($s3)		#reload the t0 checker 
 			j beginGame
 	endGame:	
+	lw $s0, 0($sp)
+	lw $s1, 4($sp)
+	lw $s2, 8($sp)
+	lw $s3, 12($sp)		
+	lw $s4, 16($sp)
+	lw $s5, 20($sp)		#pop used s variables onto the stack 
+	lw $s6, 24($sp)
 	
 	jr $ra
 .data
