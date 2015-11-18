@@ -28,12 +28,27 @@ main:
 	###################
 	
 	
+	#la $a0, 4294901760 #base address  
+	#move $a1, $v0	
+	#move $a2, $v1
+	#la $a3, command 
+	#jal playGame
+	
+	#la $a0, 4294901760 #base address  
+	#li $a1, -1	
+	#li $a1, -1
+	#la $a3, command
+	#jal playGame
+	
 	la $a0, 4294901760 #base address  
-	move $a1, $v0	
-	move $a2, $v1
-	la $a3, command 
+	li $a1, -1	
+	li $a1, -1
+	la $a3, command
 	jal playGame
 	
+	#la $a0, 0xffff0000 #base address  
+	#la $a1, 0xffff0f9f
+	#jal extracred
 	
 	end:
 	li $v0, 10
@@ -41,8 +56,9 @@ main:
 
 
 .data 
-filename: .asciiz "//files/UndergradHome/jjji/Desktop/hw3/MIPS-LawnMower-master/landscape2.map" 
+filename: .asciiz "hw3/landscape2.map" 
 .align 2
 shortvalue: .asciiz "+/xx"	#searching for lawn mower 
-command: .asciiz "sssssssssssssaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+command: .asciiz "aaaaassssswwwwwwwsssssss"
+command2: .asciiz "dddddaaaaaaa"
 .include "hw3.asm"

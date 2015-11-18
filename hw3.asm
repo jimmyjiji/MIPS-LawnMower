@@ -2,6 +2,7 @@
 # Homework #3
 # name: Jimmy Ji
 # sbuid: 109259420	
+# EXTRACREDIT
 ##############################################################
 .text
 
@@ -202,21 +203,36 @@ playGame:
 	li $s5, 32		#space 
 	li $s6, 0		#position locator 
 	
-	bltz $s1, start	#if row is -1, start mower at default location 
+	bltz $s1, defaultLocation	#if row is -1, start mower at default location 
+	j changeMowerLocation
 	
+	defaultLocation:
+		li $t0, 80
+		li $t1, 0		#address incrementer 
+		li $t2, 2
+		lw $t3, X
+		lw $t4, Y
+		mul $t3, $t3, $t0	#multiply the rows by 80
+		add  $t1, $t3, $t4	#add the column numbers to the row
+		mul $t1, $t1, $t2	
+		add $s0, $s0, $t1
+		sb $s5, 2($s0)		#delete the lawnmower 
+		j start
+		
+		
 	changeMowerLocation:
 		li $t0, 80
 		li $t1, 0		#address incrementer 
-		li $t2, 2		#multiply by 2
+		li $t2, 2		
 		mul $s1, $s1, $t0	#multiply the rows by 80
-		add  $t1, $s1, $s2
-		mul $t1, $t1, $t2
+		add  $t1, $s1, $s2	#add the column numbers to the row
+		mul $t1, $t1, $t2	#multiply by 2
 		add $s0, $s0, $t1
-		move $s6, $t1		#set position locator to current location 
 		j start
 	
 		
 	start:
+	move $s6, $t1		#set position locator to current location 
 	lb $t0, ($s3)		#load the first byte of the command line 
 	
 	
@@ -254,6 +270,27 @@ playGame:
 			j normalW
 			
 			wrapW:
+				lb $t1, 3841($s0)
+				lb $t2, 3840($s0)
+				sll $t3, $t1, 8
+				or $t3, $t3, $t2
+				move $t1, $t3		#set t1 as previous 2 bytes without having to deal with lh shenanigans 
+				##################
+				li $t2, 0xffffb06f		#flowers 
+				li $t3, 0x00007f52		#rocks
+				li $t4, 0x00002f5e		#tree
+				li $t5, 0x00003f20		#dirt
+				li $t6, 0x00004f20		#water 
+			
+				beq $t1, $t2, nextcommand
+				beq $t1, $t3, nextcommand
+				beq $t1, $t4, nextcommand
+				beq $t1, $t5, nextcommand
+				beq $t1, $t6, nextcommand
+				#########################################	checks collision in wrapping
+				
+				
+				
 				li $t1, 24
 				li $t2, 160
 				mul $t3, $t1, $t2	#set adding address to t3
@@ -307,12 +344,29 @@ playGame:
 			j normalA
 			
 			wrapA:
+				#################
+				lb $t1, 158($s0)
+				lb $t2, 159($s0)
+				sll $t3, $t1, 8
+				or $t3, $t3, $t2
+				move $t1, $t3		#set t1 as previous 2 bytes without having to deal with lh shenanigans 
+				##################
+				li $t2, 0xffffb06f		#flowers 
+				li $t3, 0x00007f52		#rocks
+				li $t4, 0x00002f5e		#tree
+				li $t5, 0x00003f20		#dirt
+				li $t6, 0x00004f20		#water 
+			
+				beq $t1, $t2, nextcommand
+				beq $t1, $t3, nextcommand
+				beq $t1, $t4, nextcommand
+				beq $t1, $t5, nextcommand
+				beq $t1, $t6, nextcommand
+				#########################################	checks collision in wrap
+			
+			
 				sb $s5, ($s0)		#delete the lawnmower 
-				addi $s0, $s0, 1	#go up to delete the grass address
-				lb $t1, ($s0) 		#create temp register for value at current address
-				ori $t1, $t1, 128	#make the bold bit 1
-				sb $t1, ($s0)		#store the change into current address
-				addi $s0, $s0, 157	#go up address
+				addi $s0, $s0, 158	#go up address
 				sb $s4, ($s0)		#create lawnmower 
 				addi $s6, $s6, 158	#move position locator 
 				j nextcommand
@@ -353,6 +407,26 @@ playGame:
 			j normalS
 			
 			wrapS:
+				#################
+				lb $t1, -3841($s0)
+				lb $t2, -3840($s0)
+				sll $t3, $t1, 8
+				or $t3, $t3, $t2
+				move $t1, $t3		#set t1 as previous 2 bytes without having to deal with lh shenanigans 
+				##################
+				li $t2, 0xffffb06f		#flowers 
+				li $t3, 0x00007f52		#rocks
+				li $t4, 0x00002f5e		#tree
+				li $t5, 0x00003f20		#dirt
+				li $t6, 0x00004f20		#water 
+			
+				beq $t1, $t2, nextcommand
+				beq $t1, $t3, nextcommand
+				beq $t1, $t4, nextcommand
+				beq $t1, $t5, nextcommand
+				beq $t1, $t6, nextcommand
+			#########################################	checks collision for wrap
+			
 				li $t1, 24
 				li $t2, 160
 				mul $t3, $t1, $t2	#set adding address to t3
@@ -404,15 +478,33 @@ playGame:
 			j normalD
 			
 			wrapD:
+				#################
+				lb $t1, -159($s0)
+				lb $t2, -158($s0)
+				sll $t3, $t1, 8
+				or $t3, $t3, $t2
+				move $t1, $t3		#set t1 as previous 2 bytes without having to deal with lh shenanigans 
+				##################
+				li $t2, 0xffffb06f		#flowers 
+				li $t3, 0x00007f52		#rocks
+				li $t4, 0x00002f5e		#tree
+				li $t5, 0x00003f20		#dirt
+				li $t6, 0x00004f20		#water 
+			
+				beq $t1, $t2, normalA
+				beq $t1, $t3, normalA
+				beq $t1, $t4, normalA
+				beq $t1, $t5, normalA
+				beq $t1, $t6, normalA
+				#########################################	checks collision in wrap
+			
+				
+				
 				sb $s5, ($s0)		#delete the lawnmower 
-				addi $s0, $s0, -161	#go back address
+				addi $s0, $s0, -160	#go back address
 				sb $s4, ($s0)		#create lawnmower 
-				addi $s6, $s6, -161	#move position locator 
-				addi $s0, $s0, 1	#go up to delete the grass address
-				lb $t1, ($s0) 		#create temp register for value at current address
-				ori $t1, $t1, 128	#make the bold bit 1
-				sb $t1, ($s0)		#store the change into current address
-				j nextcommand
+				addi $s6, $s6, -160	#move position locator 
+				j normalD
 			########################################
 			
 			normalD:
@@ -430,13 +522,25 @@ playGame:
 			
 		nextcommand:
 			li $v0, 32
-			li $a0, 100
+			li $a0, 500
 			syscall			#sleep
 			
 			addi $s3, $s3, 1	#increment command line 
 			lb $t0, ($s3)		#reload the t0 checker 
 			j beginGame
 	endGame:	
+	
+	li $t0, 80
+	li $t1, 2
+	div $s6, $t1
+	mflo $s6 
+	div $s6, $t0
+	mflo $t0	#row
+	mfhi $t1	#column
+	sb $t0, X
+	sb $t1, Y
+	
+	
 	lw $s0, 0($sp)
 	lw $s1, 4($sp)
 	lw $s2, 8($sp)
@@ -446,8 +550,28 @@ playGame:
 	lw $s6, 24($sp)
 	
 	jr $ra
+	
+extracred:
+	la $t2, extracredit
+	writeex:	
+		
+		lb $t3, ($t2)	#get byte from buffer address into t3
+		sb $t3, ($a0)	#set address of $s0 to byte $t3
+		
+		addi $t2, $t2, 1
+		addi $a0, $a0, 1
+		addi $t0, $t0, 1
+		
+		beqz $t2, closeextracred
+		blt $t0, 2400, writeex 	#if its less than the total length of the extra credit keep printing 
+closeextracred:
+	jr $ra
+
 .data
 	#Define your memory here 
 
 buffer: .space 4000
 nextline: .asciiz "\n"
+X: .word 24
+Y: .word 79
+extracredit: .asciiz " / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / ? ? ? ? ? ? ó ó ó ó ? ? ó ó ó ó ó ? ? ó ó ó ó ó ? ? ó ó ó ó ó ? ? ó ó ó ó ó ? ? ó ó ó ó ó ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? O O O O O O ó O O O O O ó O O O O O O ó O O O O O O O O O ó O O O O O O ó O O O ó O O O ó O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O _ _ _ _ _ _ ó _ _ _ _ _ ó ó ó ó ó _ _ ó ó ó ó ó _ _ _ _ ó _ _ _ _ _ _ ó _ _ _ _ ó _ _ _ ó _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ o o o o o o ó o o o o o o o o o ó o o ó o o o o o o o ó o o o o o o ó o o o o o ó o o o ó o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o / / / / / / ó ó ó ó / / ó ó ó ó ó / / ó ó ó ó ó / / ó ó ó ó ó / / ó ó ó ó ó / / ó ó ó ó ó / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o"     
